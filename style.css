@@ -1,0 +1,81 @@
+/* Base */
+* { box-sizing: border-box; }
+:root{
+  --bg: #f7efe6;          /* warm beige */
+  --panel: #fffdfb;       /* light card */
+  --ink: #1f1f1f;         /* text */
+  --muted:#6b6b6b;
+  --line:#e8ded5;
+  --accent:#2e7d6b;       /* soft teal accent */
+  --shadow: 0 8px 24px rgba(0,0,0,.06);
+  --radius: 16px;
+}
+html,body{ height:100%; }
+body{
+  margin:0; font-family: system-ui, Segoe UI, Arial, sans-serif;
+  background: linear-gradient(#fbf4ec, var(--bg));
+  color: var(--ink);
+}
+
+/* Topbar */
+.topbar{
+  position:sticky; top:0; z-index:10;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 20px; background:#fff; border-bottom:1px solid var(--line);
+}
+.brand{ font-weight:700; letter-spacing:.2px; }
+.actions button{
+  border:1px solid var(--line); background:#fff; cursor:pointer;
+  width:40px; height:40px; border-radius:12px; font-size:18px; margin-left:8px;
+}
+.actions button:hover{ background:#faf7f3; }
+
+/* Layout */
+main{ max-width:1080px; margin:0 auto; padding:32px 20px 80px; }
+.hero{
+  text-align:center; margin:32px auto 28px;
+}
+.hero h1{
+  margin:0;
+  font-size: clamp(28px, 4.2vw, 48px);
+  line-height:1.1;
+}
+.hero p{ color:var(--muted); margin-top:10px; }
+
+/* Grid of cards */
+.grid{
+  display:grid; gap:20px;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
+}
+@media (max-width: 860px){ .grid{ grid-template-columns: 1fr; } }
+
+.card{
+  background: var(--panel);
+  border:1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 22px 22px 18px;
+  box-shadow: var(--shadow);
+  text-align:center;
+}
+.card .icon{
+  font-size:42px; display:inline-block;
+  width:64px; height:64px; line-height:64px; border-radius:16px; margin-bottom:10px;
+  background: #e8f3f0; /* accent tint */
+  color: var(--accent);
+}
+.card h3{ margin:6px 0 8px; font-size:20px; }
+.card p{ margin:0 0 14px; color:var(--muted); }
+
+.btn{
+  padding:10px 12px; border-radius:12px; cursor:pointer;
+  border:1px solid var(--accent); background:var(--accent); color:#fff; font-weight:600;
+}
+.btn.ghost{ background:transparent; color:var(--accent); }
+
+.section{ margin-top:22px; }
+fieldset{ border:1px solid var(--line); border-radius:12px; padding:14px; margin:0 0 12px; }
+legend{ color:var(--muted); }
+
+/* Footer */
+.foot{ text-align:center; color:var(--muted); font-size:12px; padding:28px 16px; border-top:1px solid var(--line); background:#fff; }
+.hidden{ display:none; }

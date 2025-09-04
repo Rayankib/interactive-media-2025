@@ -1,14 +1,28 @@
 <!doctype html>
-<html lang="nl">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Interactive Media 2025</title>
+  <title>OptiVerse</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Hallo wereld 👋</h1>
-  <button id="btn">Klik mij</button>
+  <header class="topbar">
+    <div class="brand">OptiVerse</div>
+    <div class="actions">
+      <button aria-label="Account" data-route="#/account">👤</button>
+      <button aria-label="Cart" data-route="#/cart">🛒</button>
+    </div>
+  </header>
+
+  <main id="app">
+    <!-- Home is rendered by JS -->
+  </main>
+
+  <footer class="foot">
+    Guidance only — not a medical diagnosis. Your answers stay on this device.
+  </footer>
+
   <script src="app.js"></script>
 </body>
 </html>

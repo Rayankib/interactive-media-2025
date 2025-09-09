@@ -1,4 +1,4 @@
-# Interactive Media 2025 – Collaboration Guide
+# Interactive Media 2025 – Collaboration Guide 2 
 
 ## 1. Clone the Repository
 1. Go to the project page in GitLab.  

@@ -1,64 +1,67 @@
-# Interactive Media 2025 – Collaboration Guide 2 
+Interactive Media 2025 – Mijn Workflow
 
-## 1. Clone the Repository
-1. Go to the project page in GitLab.  
+Dit project staat op GitHub en deze README helpt mij om op elk apparaat snel en zonder gedoe verder te werken.
 
-2. Click **Code → HTTPS** and copy the link:  
-https://gitlab.com/rayankib-group/interactive-media-2025.git
-
-bash
-Code kopiëren
-3. Clone it:
-```bash
-git clone https://gitlab.com/rayankib-group/interactive-media-2025.git
+⭐ 1. Project binnenhalen
+git clone https://github.com/Rayankib/interactive-media-2025.git
 cd interactive-media-2025
 
-2. Personal Access Token (PAT)
-GitLab does not accept passwords for Git.
-You must use a Personal Access Token:
+⭐ 2. Werken aan het project
 
-Go to your GitLab profile → Edit profile → Access tokens.
+Open de map in VS Code
 
-Create a token with:
+Start eventueel Live Server om de pagina te testen
 
-Name: git-access
+Pas HTML, CSS of JavaScript aan zoals nodig
 
-Scopes: read_repository, write_repository
+Altijd eerst de nieuwste code ophalen:
 
-Copy and save the token.
-
-When Git asks for login:
-
-Username: your GitLab username
-
-Password: your token
-
-3. Workflow
-Always pull latest changes:
-
-bash
-Code kopiëren
 git pull
-Create a new branch:
 
-bash
-Code kopiëren
-git checkout -b feature/short-description
-Commit and push:
+⭐ 3. Committen & pushen
 
-bash
-Code kopiëren
+Wanneer ik klaar ben met aanpassen:
+
 git add .
-git commit -m "Short description"
-git push -u origin feature/short-description
-Open a Merge Request (MR):
-Go to GitLab, create an MR for your branch, assign a reviewer, and merge into main.
+git commit -m "Update"
+git push
 
-4. Rules
-Do not push directly to main.
 
-Each feature/fix → new branch.
+Origin staat nu standaard op GitHub → alles gaat direct naar de juiste repo.
 
-Use clear English commit messages.
+⭐ 4. Belangrijke bestanden
 
-Review each other’s Merge Requests before merging
+index.html – startpagina
+
+style.css – styling
+
+app.js / planner.js – functionaliteit
+
+planner.html – sportplanner scherm
+
+⭐ 5. Debuggen
+
+Gebruik console.log() om te zien wat er gebeurt
+
+Gebruik debugger in DevTools als iets vastloopt
+
+Foutmelding bij push → eerst git pull doen
+
+⭐ 6. Identiteit instellen (indien nodig)
+
+Als Git om mijn naam/mail vraagt:
+
+git config --global user.name "Rayan"
+git config --global user.email "r.fikri@student.fontys.nl"
+
+⭐ 7. Kleine reminders voor mezelf
+
+HTML = structuur
+
+CSS = styling
+
+JavaScript = logica
+
+Regelmatig pushen zodat ik nooit werk verlies
+
+Houd mappen en bestandsnamen netjes

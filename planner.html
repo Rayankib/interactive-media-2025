@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Weekplanner</title>
+  <title>Trainingen – FitPlanner</title>
   <link rel="stylesheet" href="style.css" />
   <script defer src="planner.js"></script>
 </head>
@@ -12,12 +12,65 @@
     <a class="backlink" href="index.html" aria-label="Terug naar overzicht">← Terug</a>
     <div class="planner-head">
       <h1 id="plannerTitle">Weekplanner</h1>
-      <p class="hint">Klik op “Deelnemen” om uw kind aan te melden. Je ziet direct een bevestiging en het aantal deelnemers wordt bijgewerkt.</p>
+      <p class="hint">Tik op "Deelnemen" om je kind in te schrijven. Je krijgt meteen bevestiging en het aantal deelnemers wordt bijgewerkt.</p>
     </div>
     <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
   </header>
 
-  <main id="scheduleContainer" class="schedule"></main>
+  <main class="plans-main">
+    <!-- Sport selector - allow changing sport without going back -->
+    <div class="planner-context">
+      <div id="sportSelector" class="sport-selector" aria-label="Selecteer sport" hidden>
+        <label for="sportDropdown" class="sport-selector-label">Sport</label>
+        <select id="sportDropdown" class="sport-dropdown" aria-label="Wissel sport">
+          <option value="">Kies een sport...</option>
+        </select>
+      </div>
+      <div class="planner-actions">
+        <button id="toggleSportBtn" class="ghost small">Wijzig sport</button>
+        <button id="toggleFiltersBtn" class="ghost small">Opties (optioneel)</button>
+      </div>
+    </div>
+
+    <!-- Filters: Day, Age (groep), Type (Jongens/Meisjes/Gemengd) -->
+    <div id="plannerFilters" class="filter-section" hidden aria-label="Filters">
+      <div class="filters-header">
+        <h3 class="filters-title">Opties (optioneel)</h3>
+        <span id="resultCount" class="result-count">0 trainingen</span>
+        <p class="filters-hint">Gebruik alleen opties als je de lijst wilt beperken.</p>
+      </div>
+
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label for="dayFilter" class="filter-label">Dag</label>
+          <select id="dayFilter" class="filter-select" aria-label="Filter op dag">
+            <option value="">Alles</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="ageFilter" class="filter-label">Leeftijd</label>
+          <select id="ageFilter" class="filter-select" aria-label="Filter op leeftijd">
+            <option value="">Alles</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="typeFilter" class="filter-label">Type</label>
+          <select id="typeFilter" class="filter-select" aria-label="Filter op type">
+            <option value="">Alles</option>
+            <option value="Jongens">Jongens</option>
+            <option value="Meisjes">Meisjes</option>
+            <option value="Mixed">Gemengd</option>
+          </select>
+        </div>
+      </div>
+
+      <button id="resetFiltersBtn" class="filter-reset-btn" hidden>Wis opties</button>
+    </div>
+
+    <div id="scheduleContainer" class="schedule"></div>
+  </main>
 
   <footer class="site-footer">
     <p>© 2025 FitPlanner</p>

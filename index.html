@@ -3,24 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Sportactiviteiten voor Ouders</title>
+  <title>FitPlanner – Meld je kind aan voor sporten</title>
   <link rel="stylesheet" href="style.css" />
   <script defer src="app.js"></script>
 </head>
 <body>
   <header class="site-header">
-    <h1>Sportactiviteiten</h1>
-    <p class="sub">Een eenvoudige manier om je kind aan te melden voor lokale sportactiviteiten — snel, veilig en overzichtelijk.</p>
+    <h1>Meld je kind aan bij sporten</h1>
+    <p class="sub">Kies een activiteit, meld je kind aan, klaar. Geen gedoe, geen formulieren.</p>
     <div class="hero">
-      <p class="hero-lead">Plan sportweekjes, meld je kind aan namens hem/haar en houd het aantal deelnemers bij — alles vanaf je telefoon.</p>
+      <p class="hero-lead">Meld je kind aan voor trainingen, volg wie er allemaal meegaat, en beheer alles vanaf je telefoon.</p>
       <div class="hero-cta">
-        <button id="ctaChoose" class="primary">Kies een sport</button>
-        <a href="myplans.html" class="ghost" aria-label="Bekijk mijn plannen">Mijn plannen</a>
+        <button id="ctaChoose" class="primary">Start met een sport</button>
+        <a href="myplans.html" class="ghost" aria-label="Bekijk mijn plannen">Mijn inschrijvingen</a>
       </div>
       <ul class="benefits" aria-hidden="false">
-        <li>Snelle aanmelding namens je kind</li>
-        <li>Persoonlijke aantallen per training (local)</li>
-        <li>Toegankelijk en mobielvriendelijk</li>
+        <li>Geen ingewikkelde formulieren</li>
+        <li>Zie meteen hoeveel kinderen meedoen</li>
+        <li>Werkt op je telefoon</li>
       </ul>
     </div>
   </header>
@@ -58,9 +58,24 @@
     </button>
   </main>
 
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
   <footer class="site-footer">
     <p>© 2025 FitPlanner</p>
   </footer>
+
+  <!-- Sticky action bar - always visible above bottom navigation -->
+  <div class="sticky-action-bar" id="actionBar">
+    <div class="action-content">
+      <div class="action-info">
+        <span id="selectionHint" hidden>Geselecteerd: <strong id="hintSport"></strong></span>
+      </div>
+      <div class="action-buttons">
+        <button id="viewPlannerBtn" class="primary" aria-label="Bekijk trainingen">Bekijk trainingen</button>
+        <button id="clearSelectionBtn" class="ghost reset-btn" aria-label="Wis keuze" hidden>Wis keuze</button>
+      </div>
+    </div>
+  </div>
   <!-- Bottom navigation to feel like a native app -->
   <nav class="bottom-nav" aria-label="Navigatie">
     <a href="index.html" class="bn-item active" aria-current="page">

@@ -1,6 +1,9 @@
 function ucfirst(s){ return s ? s.charAt(0).toUpperCase() + s.slice(1) : ""; }
 function qs(sel, root=document){ return root.querySelector(sel); }
 
+// Day order for proper sorting
+const DAY_ORDER = ["Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag", "Zondag"];
+
 // Convert geslacht to user-friendly Dutch label
 function getGeslachtLabel(geslacht){
   if (!geslacht) return "Onbekend";
@@ -110,9 +113,67 @@ function showToast(message, timeout=2200){
 
 document.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
-  const sport = (params.get("sport")||"").toLowerCase();
+  let sport = (params.get("sport")||"").toLowerCase();
   const title = qs("#plannerTitle");
   const container = qs("#scheduleContainer");
+  const sportSelector = qs("#sportDropdown");
+
+  // Initialize sport selector with all available sports
+  if (sportSelector) {
+    Object.keys(SCHEDULES).sort().forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s;
+      opt.textContent = ucfirst(s);
+      sportSelector.appendChild(opt);
+    });
+    // Set current sport
+    if (sport && SCHEDULES[sport]) {
+      sportSelector.value = sport;
+    }
+    // Listen for sport changes
+    sportSelector.addEventListener('change', (e) => {
+      const newSport = e.currentTarget.value;
+      if (newSport && SCHEDULES[newSport]) {
+        sport = newSport;
+        // Update URL without reloading
+        window.history.replaceState(null, '', `?sport=${encodeURIComponent(newSport)}`);
+        // Reset filters and re-render
+        if (daySelect) daySelect.value = '';
+        if (ageSelect) ageSelect.value = '';
+        if (typeSelect) typeSelect.value = '';
+        masterList = Array.isArray(SCHEDULES[sport]) ? SCHEDULES[sport].slice() : [];
+        title.textContent = `Weekplanner – ${ucfirst(sport)}`;
+        populateFilterOptions();
+        applyAndRender();
+      }
+    });
+  }
+
+  // Toggle controls: sport and filters are secondary actions
+  const toggleSportBtn = qs('#toggleSportBtn');
+  const toggleFiltersBtn = qs('#toggleFiltersBtn');
+  const filtersEl = qs('#plannerFilters');
+
+  if (toggleSportBtn && sportSelector) {
+    toggleSportBtn.addEventListener('click', () => {
+      const now = sportSelector.hidden;
+      sportSelector.hidden = !now ? true : false; // toggle
+      sportSelector.hidden = !now;
+      if (!sportSelector.hidden) sportSelector.focus();
+    });
+  }
+
+  if (toggleFiltersBtn && filtersEl) {
+    toggleFiltersBtn.addEventListener('click', () => {
+      const now = filtersEl.hidden;
+      filtersEl.hidden = !now ? true : false;
+      filtersEl.hidden = !now;
+      if (!filtersEl.hidden) {
+        // populate when shown
+        populateFilterOptions();
+      }
+    });
+  }
 
   if (!sport || !SCHEDULES[sport]) {
     title.textContent = "Weekplanner";
@@ -122,58 +183,118 @@ document.addEventListener("DOMContentLoaded", () => {
 
   title.textContent = `Weekplanner – ${ucfirst(sport)}`;
 
-  // groepeer per dag
-  const perDag = {};
-  SCHEDULES[sport].forEach(it => { (perDag[it.dag] ??= []).push(it); });
+  // Filters: create UI wiring and render helper (do not change stored data)
+  let masterList = Array.isArray(SCHEDULES[sport]) ? SCHEDULES[sport].slice() : [];
+  // filtersEl already referenced above
+  const daySelect = qs('#dayFilter');
+  const ageSelect = qs('#ageFilter');
+  const typeSelect = qs('#typeFilter');
+  const resetBtn = qs('#resetFiltersBtn');
 
-  Object.keys(perDag).forEach(dag => {
-    const section = document.createElement("section");
-    section.className = "day-section";
-    section.innerHTML = `<h3>${dag}</h3><div class="slot-list"></div>`;
-    const list = section.querySelector(".slot-list");
-
-    perDag[dag].forEach(it => {
-      const card = document.createElement("article");
-      card.className = "slot";
-      const key = keyFor(sport,it);
-      const count = getCountForKey(key);
-      const joined = isJoinedKey(key);
-      const tagClass = it.geslacht === "Mixed" ? "tag-mixed" : (it.geslacht === "Jongens" ? "tag-boys" : "tag-girls");
-      card.innerHTML = `
-        <div class="slot-meta">
-          <div class="slot-time">${it.tijd}</div>
-          <div class="slot-tags">
-            <span class="tag">Leeftijd ${it.groep}</span>
-            <span class="tag ${tagClass}">${it.geslacht}</span>
-          </div>
-        </div>
-        <div class="slot-actions">
-          <button class="join-btn" type="button">${joined ? 'Aangemeld ✓' : 'Deelnemen'}</button>
-          <div class="count" aria-live="polite">👥 <span>${count}</span></div>
-        </div>
-      `;
-      const btn = card.querySelector(".join-btn");
-      const cnt = card.querySelector(".count span");
-      if (joined) { btn.disabled = true; }
-      btn.addEventListener("click", () => {
-        if (isJoinedKey(key)) return;
-        const added = joinSlot(sport, it);
-        if (added) {
-          const newCount = getCountForKey(key);
-          cnt.textContent = newCount;
-          btn.disabled = true; btn.textContent = "Aangemeld ✓";
-          card.classList.add("flash"); setTimeout(()=>card.classList.remove("flash"), 420);
-          showToast(`Aangemeld: ${ucfirst(sport)} — ${it.dag} ${it.tijd}`);
-        }
-      });
-      list.appendChild(card);
+  function populateFilterOptions(){
+    if (!daySelect || !ageSelect) return;
+    const days = Array.from(new Set(masterList.map(it=>it.dag)));
+    days.sort((a,b)=> DAY_ORDER.indexOf(a) - DAY_ORDER.indexOf(b));
+    const groups = Array.from(new Set(masterList.map(it=>it.groep)));
+    groups.sort((x,y)=>{
+      const ax = parseInt((x||'').match(/\d+/)?.[0]||0,10);
+      const ay = parseInt((y||'').match(/\d+/)?.[0]||0,10);
+      return ax - ay;
     });
 
-    container.appendChild(section);
-  });
+    daySelect.innerHTML = '<option value="">Alles</option>';
+    ageSelect.innerHTML = '<option value="">Alles</option>';
+    days.forEach(d=>{ const o=document.createElement('option'); o.value=d; o.textContent=d; daySelect.appendChild(o); });
+    groups.forEach(g=>{ const o=document.createElement('option'); o.value=g; o.textContent=g; ageSelect.appendChild(o); });
+  }
 
-  // Link to view all joined plans
-  const allLink = document.createElement('div'); allLink.className='all-link';
-  allLink.innerHTML = `<a href="myplans.html" class="ghost">Bekijk mijn plannen</a>`;
-  container.appendChild(allLink);
+  function renderSchedule(list){
+    container.innerHTML = '';
+    const resultCount = qs('#resultCount');
+    
+    if (!Array.isArray(list) || list.length === 0){
+      const empty = document.createElement('div'); empty.className='empty';
+      empty.innerHTML = `<p>Geen trainingen gevonden met deze filters</p>`;
+      container.appendChild(empty);
+      if (resetBtn) resetBtn.hidden = false;
+      if (resultCount) resultCount.textContent = '0 trainingen';
+      return;
+    }
+
+    // Update result count
+    if (resultCount) {
+      const count = list.length;
+      resultCount.textContent = `${count} ${count === 1 ? 'training' : 'trainingen'}`;
+    }
+
+    const perDag = {};
+    list.forEach(it=>{ (perDag[it.dag] ??= []).push(it); });
+    const ordered = Object.keys(perDag).sort((a,b)=> DAY_ORDER.indexOf(a) - DAY_ORDER.indexOf(b));
+    ordered.forEach(dag=>{
+      const section = document.createElement('section'); section.className='day-section';
+      section.innerHTML = `<h3>${dag}</h3><div class="slot-list"></div>`;
+      const listEl = section.querySelector('.slot-list');
+
+      perDag[dag].forEach(it=>{
+        const card = document.createElement('article'); card.className='slot';
+        const key = keyFor(sport,it);
+        const count = getCountForKey(key);
+        const joined = isJoinedKey(key);
+        const tagClass = (it.geslacht && it.geslacht.toLowerCase().startsWith('m')) ? 'tag-mixed' : (it.geslacht === 'Jongens' ? 'tag-boys' : 'tag-girls');
+        card.innerHTML = `
+          <div class="slot-meta">
+            <div class="slot-time">${it.tijd}</div>
+            <div class="slot-tags">
+              <span class="tag">Leeftijd ${it.groep}</span>
+              <span class="tag ${tagClass}">${getGeslachtLabel(it.geslacht)}</span>
+            </div>
+          </div>
+          <div class="slot-actions">
+            <button class="join-btn ${joined ? '' : 'primary'}" type="button">${joined ? 'Aangemeld ✓' : 'Deelnemen'}</button>
+            <div>
+              <div class="count" aria-live="polite">👥 <span>${count}</span></div>
+              <div class="slot-help">Je kunt je inschrijving later annuleren.</div>
+            </div>
+          </div>
+        `;
+        const btn = card.querySelector('.join-btn');
+        const cnt = card.querySelector('.count span');
+        if (joined) btn.disabled = true;
+        btn.addEventListener('click', ()=>{
+          if (isJoinedKey(key)) return;
+          const added = joinSlot(sport,it);
+          if (added){ cnt.textContent = getCountForKey(key); btn.disabled = true; btn.textContent='Aangemeld ✓'; card.classList.add('flash'); setTimeout(()=>card.classList.remove('flash'),420); showToast(`Klaar! Je kind staat ingeschreven voor ${ucfirst(sport)}`); }
+        });
+        listEl.appendChild(card);
+      });
+
+      container.appendChild(section);
+    });
+
+    const allLink = document.createElement('div'); allLink.className='all-link';
+    allLink.innerHTML = `<a href="myplans.html" class="ghost">Bekijk mijn plannen</a>`;
+    container.appendChild(allLink);
+    if (resetBtn) resetBtn.hidden = true;
+  }
+
+  function applyAndRender(){
+    const dayVal = daySelect ? daySelect.value : '';
+    const ageVal = ageSelect ? ageSelect.value : '';
+    const typeVal = typeSelect ? typeSelect.value : '';
+    let filtered = masterList.slice();
+    if (dayVal) filtered = filtered.filter(it=>it.dag===dayVal);
+    if (ageVal) filtered = filtered.filter(it=>it.groep===ageVal);
+    if (typeVal) filtered = filtered.filter(it=> (it.geslacht||'').toLowerCase()===typeVal.toLowerCase());
+    renderSchedule(filtered);
+  }
+
+  if (filtersEl){
+    filtersEl.hidden = false; populateFilterOptions();
+    if (daySelect) daySelect.addEventListener('change', applyAndRender);
+    if (ageSelect) ageSelect.addEventListener('change', applyAndRender);
+    if (typeSelect) typeSelect.addEventListener('change', applyAndRender);
+    if (resetBtn) resetBtn.addEventListener('click', ()=>{ if (daySelect) daySelect.value=''; if (ageSelect) ageSelect.value=''; if (typeSelect) typeSelect.value=''; applyAndRender(); });
+  }
+
+  renderSchedule(masterList);
 });

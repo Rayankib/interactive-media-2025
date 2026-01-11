@@ -10,10 +10,22 @@
 <body>
   <header class="site-header">
     <h1>Sportactiviteiten</h1>
-    <p>Kies een sport om de weekplanner te bekijken.</p>
+    <p class="sub">Een eenvoudige manier om je kind aan te melden voor lokale sportactiviteiten — snel, veilig en overzichtelijk.</p>
+    <div class="hero">
+      <p class="hero-lead">Plan sportweekjes, meld je kind aan namens hem/haar en houd het aantal deelnemers bij — alles vanaf je telefoon.</p>
+      <div class="hero-cta">
+        <button id="ctaChoose" class="primary">Kies een sport</button>
+        <a href="myplans.html" class="ghost" aria-label="Bekijk mijn plannen">Mijn plannen</a>
+      </div>
+      <ul class="benefits" aria-hidden="false">
+        <li>Snelle aanmelding namens je kind</li>
+        <li>Persoonlijke aantallen per training (local)</li>
+        <li>Toegankelijk en mobielvriendelijk</li>
+      </ul>
+    </div>
   </header>
 
-  <main class="sport-grid">
+  <main id="sports" class="sport-grid" aria-label="Lijst van sporten">
     <button class="sport-card" data-sport="voetbal" aria-label="Voetbal">
       <div class="sport-visual">⚽</div><h2>Voetbal</h2>
     </button>
@@ -49,5 +61,16 @@
   <footer class="site-footer">
     <p>© 2025 FitPlanner</p>
   </footer>
+  <!-- Bottom navigation to feel like a native app -->
+  <nav class="bottom-nav" aria-label="Navigatie">
+    <a href="index.html" class="bn-item active" aria-current="page">
+      <span class="bn-icon">🏠</span>
+      <span class="bn-label">Home</span>
+    </a>
+    <a href="myplans.html" class="bn-item">
+      <span class="bn-icon">✓</span>
+      <span class="bn-label">Mijn plannen</span>
+    </a>
+  </nav>
 </body>
 </html>

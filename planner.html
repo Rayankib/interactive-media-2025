@@ -10,8 +10,11 @@
 <body>
   <header class="site-header">
     <a class="backlink" href="index.html" aria-label="Terug naar overzicht">← Terug</a>
-    <h1 id="plannerTitle">Weekplanner</h1>
-    <p class="hint">Klik op “Deelnemen” om jezelf als ouder namens je kind aan te melden.</p>
+    <div class="planner-head">
+      <h1 id="plannerTitle">Weekplanner</h1>
+      <p class="hint">Klik op “Deelnemen” om uw kind aan te melden. Je ziet direct een bevestiging en het aantal deelnemers wordt bijgewerkt.</p>
+    </div>
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
   </header>
 
   <main id="scheduleContainer" class="schedule"></main>
@@ -19,5 +22,15 @@
   <footer class="site-footer">
     <p>© 2025 FitPlanner</p>
   </footer>
+  <nav class="bottom-nav" aria-label="Navigatie">
+    <a href="index.html" class="bn-item">
+      <span class="bn-icon">🏠</span>
+      <span class="bn-label">Home</span>
+    </a>
+    <a href="myplans.html" class="bn-item active" aria-current="page">
+      <span class="bn-icon">✓</span>
+      <span class="bn-label">Mijn plannen</span>
+    </a>
+  </nav>
 </body>
 </html>

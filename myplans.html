@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mijn Plannen – Sportactiviteiten</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="myplans.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="backlink" href="index.html" aria-label="Terug naar overzicht">← Terug</a>
+  </header>
+
+  <main class="plans-main">
+    <div class="myplans-head">
+      <h1>Mijn Trainingsschema</h1>
+      <p class="myplans-subtitle">Alle aanmeldingen van je kind op één plek</p>
+    </div>
+
+    <!-- Summary block with total count -->
+    <div id="summaryBlock" class="summary-block" hidden>
+      <div class="summary-content">
+        <span class="summary-icon">📅</span>
+        <span id="summaryText" class="summary-text"></span>
+      </div>
+    </div>
+
+    <!-- Plans container -->
+    <div id="plansContainer"></div>
+
+    <!-- Toast notification -->
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2025 FitPlanner</p>
+  </footer>
+  
+  <!-- Bottom navigation to feel like a native app -->
+  <nav class="bottom-nav" aria-label="Navigatie">
+    <a href="index.html" class="bn-item">
+      <span class="bn-icon">🏠</span>
+      <span class="bn-label">Home</span>
+    </a>
+    <a href="myplans.html" class="bn-item active" aria-current="page">
+      <span class="bn-icon">✓</span>
+      <span class="bn-label">Mijn plannen</span>
+    </a>
+  </nav>
+</body>
+</html>

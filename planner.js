@@ -1,6 +1,18 @@
 function ucfirst(s){ return s ? s.charAt(0).toUpperCase() + s.slice(1) : ""; }
 function qs(sel, root=document){ return root.querySelector(sel); }
 
+// Convert geslacht to user-friendly Dutch label
+function getGeslachtLabel(geslacht){
+  if (!geslacht) return "Onbekend";
+  const map = {
+    "Jongens": "Jongens",
+    "Meisjes": "Meisjes",
+    "Mixed": "Gemengd",
+    "gemengd": "Gemengd"
+  };
+  return map[geslacht] || "Onbekend";
+}
+
 const SCHEDULES = {
   // let op: voetbal gescheiden jongens/meisjes
   voetbal: [
@@ -61,10 +73,39 @@ const SCHEDULES = {
 };
 
 function keyFor(sport, it){ return `signups:${sport}:${it.dag}:${it.tijd}:${it.groep}:${it.geslacht}`; }
-function getCount(sport, it){ return parseInt(localStorage.getItem(keyFor(sport,it))||"0",10); }
-function addSignup(sport, it){
-  const k = keyFor(sport,it); const next = getCount(sport,it)+1;
-  localStorage.setItem(k, String(next)); return next;
+function parseKey(key){
+  // key format: signups:sport:dag:tijd:groep:geslacht
+  // Note: tijd contains colons (e.g., "17:30–19:00"), so we need to handle this carefully
+  const parts = key.split(":");
+  // parts[0]=signups, [1]=sport, [2]=dag, [3]=hour, [4]=min–hour, [5]=min, [6]=groep, [7]=geslacht
+  return {
+    sport: parts[1],
+    dag: parts[2],
+    tijd: parts[3] + ":" + parts[4] + ":" + parts[5],  // Reconstruct time as HH:MM–HH:MM
+    groep: parts[6],
+    geslacht: parts[7]
+  };
+}
+function getCountForKey(key){ return parseInt(localStorage.getItem(key)||"0",10); }
+function changeCountForKey(key, delta){
+  const cur = getCountForKey(key); const next = Math.max(0, cur + delta);
+  localStorage.setItem(key, String(next)); return next;
+}
+
+// Joined sessions stored per-device under 'joined' as array of keys
+function getJoined(){ try{ return JSON.parse(localStorage.getItem('joined')||'[]') }catch(e){ return [] } }
+function saveJoined(arr){ localStorage.setItem('joined', JSON.stringify(arr)); }
+function isJoinedKey(key){ return getJoined().includes(key); }
+function joinSlot(sport, it){ const key = keyFor(sport,it); if (isJoinedKey(key)) return false; const arr = getJoined(); arr.push(key); saveJoined(arr); changeCountForKey(key, +1); return true; }
+function unjoinByKey(key){ if (!isJoinedKey(key)) return false; const arr = getJoined().filter(k=>k!==key); saveJoined(arr); changeCountForKey(key, -1); return true; }
+
+// Toast helper: accessible feedback for mobile parents
+function showToast(message, timeout=2200){
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = message; el.hidden = false; el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=>{ el.classList.remove('show'); el._t2 = setTimeout(()=>{ el.hidden = true },220); }, timeout);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -94,7 +135,9 @@ document.addEventListener("DOMContentLoaded", () => {
     perDag[dag].forEach(it => {
       const card = document.createElement("article");
       card.className = "slot";
-      const count = getCount(sport, it);
+      const key = keyFor(sport,it);
+      const count = getCountForKey(key);
+      const joined = isJoinedKey(key);
       const tagClass = it.geslacht === "Mixed" ? "tag-mixed" : (it.geslacht === "Jongens" ? "tag-boys" : "tag-girls");
       card.innerHTML = `
         <div class="slot-meta">
@@ -105,21 +148,32 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         </div>
         <div class="slot-actions">
-          <button class="join-btn" type="button">Deelnemen</button>
+          <button class="join-btn" type="button">${joined ? 'Aangemeld ✓' : 'Deelnemen'}</button>
           <div class="count" aria-live="polite">👥 <span>${count}</span></div>
         </div>
       `;
       const btn = card.querySelector(".join-btn");
       const cnt = card.querySelector(".count span");
+      if (joined) { btn.disabled = true; }
       btn.addEventListener("click", () => {
-        const n = addSignup(sport, it);
-        cnt.textContent = n;
-        btn.disabled = true; btn.textContent = "Aangemeld ✓";
-        card.classList.add("flash"); setTimeout(()=>card.classList.remove("flash"), 400);
+        if (isJoinedKey(key)) return;
+        const added = joinSlot(sport, it);
+        if (added) {
+          const newCount = getCountForKey(key);
+          cnt.textContent = newCount;
+          btn.disabled = true; btn.textContent = "Aangemeld ✓";
+          card.classList.add("flash"); setTimeout(()=>card.classList.remove("flash"), 420);
+          showToast(`Aangemeld: ${ucfirst(sport)} — ${it.dag} ${it.tijd}`);
+        }
       });
       list.appendChild(card);
     });
 
     container.appendChild(section);
   });
+
+  // Link to view all joined plans
+  const allLink = document.createElement('div'); allLink.className='all-link';
+  allLink.innerHTML = `<a href="myplans.html" class="ghost">Bekijk mijn plannen</a>`;
+  container.appendChild(allLink);
 });
